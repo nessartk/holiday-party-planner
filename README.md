@@ -1,7 +1,7 @@
 # Plataforma de Organização de Festas de Fim de Ano
 
 ## Descrição
-
+ 
 "Plataforma de Organização de Festas de Fim de Ano" é uma aplicação que oferece uma interface web (SPRING) responsável pelo planejamento e organização de festas de fim de ano. Projeto desenvolvido em JAVA e SPRING, utilizando bibliotecas externas para a administração de bancos de dados.
 
 ## Modelagem de Banco de Dados - Modelo Conceitual
