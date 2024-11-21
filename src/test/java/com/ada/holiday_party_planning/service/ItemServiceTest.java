@@ -89,7 +89,6 @@ class ItemServiceTest {
         assertThrows(EventNotFoundException.class, () -> itemService.createItem(item, eventId));
         verifyNoMoreInteractions(itemRepository);
 
-
     }
 
 
