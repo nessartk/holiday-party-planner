@@ -62,6 +62,11 @@ public class Item {
         this.value = value;
         this.event = event;
     }
+    public Item( UUID itemId, Event event){
+        this.itemId = itemId;
+        this.event = event;
+    }
+
 
     //Getters e Setters
 
