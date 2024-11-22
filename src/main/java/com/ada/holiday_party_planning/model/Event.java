@@ -119,9 +119,10 @@ public class Event {
      * @param partyOwner Dono do evento.
      */
 
-    public Event (String theme, String title, LocalDateTime date,
+    public Event ( String theme, String title, LocalDateTime date,
                   String place, String description,
                   Boolean funActivate, String categoryFun, PartyOwner partyOwner) {
+
         this.theme = theme;
         this.title = title;
         this.date = date;
@@ -132,6 +133,10 @@ public class Event {
         this.partyOwner = partyOwner;
 
     }
+    public Event (UUID eventId){
+        this.eventId = eventId;
+    }
+
 
     // Getters e Setters
 

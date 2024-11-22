@@ -11,12 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -37,8 +36,8 @@ class ItemServiceTest {
     @BeforeEach
     void setUp() {
         eventRepository = mock(EventRepository.class);
-        itemRepository = mock(ItemRepository.class);
         guestRepository = mock(GuestRepository.class);
+        itemRepository = Mockito.mock(ItemRepository.class);
         itemService = new ItemService(itemRepository, eventRepository, guestRepository);
 
 
@@ -84,7 +83,7 @@ class ItemServiceTest {
     @Test
     void dadoUmItemEUmEventIdInexistente_quandoCreateItem_entaoLancaEventNotFoundException() {
         // Dado
-        UUID eventId = UUID.randomUUID();
+        UUID eventId =UUID.randomUUID();
         Item item = new Item();
         item.setName("chester");
         item.setQuantity(1);
@@ -143,7 +142,29 @@ class ItemServiceTest {
     }
 
     @Test
-    void itemsByEventId() {
+    void dadoItemsAUmEventIdEspecifico_quandoListaItensByEventId_entaoRetornaItensByEventIdEspecifico() {
+        //dado
+
+        UUID eventId = UUID.randomUUID();
+
+        Item item1 = new Item(UUID.randomUUID(), new Event(eventId));
+        Item item2 = new Item(UUID.randomUUID(), new Event(eventId));
+        Item item3 = new Item(UUID.randomUUID(), new Event(UUID.randomUUID()));
+
+        List<Item> mockItems = new ArrayList<>(List.of(item1,item2,item3));
+        when(itemRepository.findAll()).thenReturn(mockItems);
+
+        //quando
+        List<Item> result= itemService.itemsByEventId(eventId);
+
+        //entao
+        assertEquals(2,result.size());
+        assertTrue(result.contains(item1));
+        assertTrue(result.contains(item2));
+        assertFalse(result.contains(item3));
+
+        verify(itemRepository,times(1)).findAll();
+
     }
 
     @Test
