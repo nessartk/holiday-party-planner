@@ -8,22 +8,30 @@ import com.ada.holiday_party_planning.repository.GuestRepository;
 import com.ada.holiday_party_planning.repository.ItemRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.mockito.Mockito;
-import org.mockito.exceptions.verification.NoInteractionsWanted;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class ItemServiceTest {
 
-    private ItemService itemService;
+    @InjectMocks
+    private ItemService itemService;// classe q contem os metodos do Item
+
+    @Mock
     private EventRepository eventRepository;
+
+    @Mock
     private ItemRepository itemRepository;
+
+    @Mock
     private GuestRepository guestRepository;
 
     @BeforeEach
@@ -74,7 +82,7 @@ class ItemServiceTest {
     }
 
     @Test
-    void dadoUmItemEUmEventoInexistente_quandoCreateItem_entaoLancaEventNotFoundException() {
+    void dadoUmItemEUmEventIdInexistente_quandoCreateItem_entaoLancaEventNotFoundException() {
         // Dado
         UUID eventId = UUID.randomUUID();
         Item item = new Item();
@@ -93,7 +101,45 @@ class ItemServiceTest {
 
 
     @Test
-    void updateItem() {
+    void dadoUmItemEUmEventIdValidos_quandoUpdateItem_entaoRetornarItemSalvo() {
+        //Dado
+       UUID eventId = UUID.randomUUID();
+       Event mockEvent = new Event();
+       mockEvent.setEventId(eventId);
+
+       Item mockItem = new Item();
+       Item updatedItem = new Item();
+       updatedItem.setEvent(mockEvent);
+
+        Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.of(mockEvent));
+        Mockito.when(itemRepository.save(mockItem)).thenReturn(updatedItem);
+
+        // Quando
+        Item result = itemService.updateItem(mockItem,eventId);
+
+        //Entao
+        Mockito.verify(eventRepository).findById(eventId);
+        Mockito.verify(itemRepository).save(mockItem);
+        assertEquals(mockEvent, result.getEvent());
+
+    }
+
+    @Test
+    void dadoUmItemEUmEventIdInexistente_quandoUpdateItem_entaoLancaEventNotFoundException(){
+        //Dado
+        UUID invalidEventId = UUID.randomUUID();
+        Item mockItem = new Item();
+
+        Mockito.when(eventRepository.findById(invalidEventId)).thenReturn(Optional.empty());
+
+        //Quando e Entao
+        assertThrows(EventNotFoundException.class, () ->
+            itemService.updateItem(mockItem, invalidEventId));
+
+
+        Mockito.verify(eventRepository).findById(invalidEventId);
+        Mockito.verifyNoMoreInteractions(itemRepository);
+
     }
 
     @Test
