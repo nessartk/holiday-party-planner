@@ -3,6 +3,7 @@ package com.ada.holiday_party_planning.repository;
 import com.ada.holiday_party_planning.model.Event;
 import com.ada.holiday_party_planning.model.Guest;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +17,7 @@ import java.util.UUID;
  *
  * O Spring Data JPA automaticamente implementa essa interface para interagir com o banco de dados.
  */
-
+@Repository
 public interface GuestRepository extends JpaRepository<Guest, UUID> {
 
     /**

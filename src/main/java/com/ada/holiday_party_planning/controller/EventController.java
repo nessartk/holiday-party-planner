@@ -5,9 +5,11 @@ import com.ada.holiday_party_planning.model.Event;
 import com.ada.holiday_party_planning.service.EmailService;
 import com.ada.holiday_party_planning.service.EventService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -20,20 +22,17 @@ import java.util.UUID;
 @RequestMapping("/event")
 public class EventController {
 
-    private final EventService eventService;
-    private final EmailService emailService;
+    @Autowired
+    private EventService eventService;
+
+    @Autowired
+    private EmailService emailService;
 
     /**
      * Construtor que injeta o serviço de eventos.
      *
      * @param eventService Serviço para manipulação de dados de eventos.
      */
-
-    public EventController(EventService eventService, EmailService emailService) {
-
-        this.eventService = eventService;
-        this.emailService = emailService;
-    }
 
     /**
      * Obtém todos os eventos cadastrados.
@@ -64,7 +63,7 @@ public class EventController {
      * Cria um novo evento associado a um proprietário específico.
      *
      * @param ownerId Identificador do proprietário do evento.
-     * @param event Dados do evento a ser criado.
+     * @param event   Dados do evento a ser criado.
      * @return Resposta HTTP com status 201 Created em caso de sucesso.
      */
 
@@ -77,7 +76,7 @@ public class EventController {
     /**
      * Atualiza um evento existente.
      *
-     * @param eventId Identificador do evento a ser atualizado.
+     * @param eventId        Identificador do evento a ser atualizado.
      * @param updateEventDTO Dados para atualização do evento.
      * @return Resposta HTTP com status 200 OK em caso de sucesso.
      */
