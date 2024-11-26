@@ -10,6 +10,7 @@ import com.ada.holiday_party_planning.repository.EventRepository;
 import com.ada.holiday_party_planning.repository.GuestRepository;
 import com.ada.holiday_party_planning.repository.ItemRepository;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -28,10 +29,12 @@ public class ItemService {
 
     /**
      * Construtor do serviço que recebe os repositórios necessários.
+     *
      * @param itemRepository  Repositório para manipulação de itens.
      * @param eventRepository Repositório para manipulação de eventos.
      * @param guestRepository Repositório para manipulação de convidados.
      */
+
 
     public ItemService(ItemRepository itemRepository, EventRepository eventRepository, GuestRepository guestRepository) {
         this.itemRepository = itemRepository;
@@ -39,9 +42,11 @@ public class ItemService {
         this.guestRepository = guestRepository;
     }
 
+
     /**
      * Cria um novo item e o associa ao evento especificado.
-     * @param item  O item a ser criado.
+     *
+     * @param item    O item a ser criado.
      * @param eventId O ID do evento ao qual o item será associado.
      * @return O item criado.
      * @throws EventNotFoundException Se o evento não for encontrado.
@@ -56,7 +61,8 @@ public class ItemService {
 
     /**
      * Atualiza um item existente e o associa ao evento especificado.
-     * @param item  O item a ser atualizado.
+     *
+     * @param item    O item a ser atualizado.
      * @param eventId O ID do evento ao qual o item será associado.
      * @return O item atualizado.
      * @throws EventNotFoundException Se o evento não for encontrado.
@@ -71,6 +77,7 @@ public class ItemService {
 
     /**
      * Retorna todos os itens associados a um evento específico.
+     *
      * @param eventId O ID do evento.
      * @return Uma lista de itens associados ao evento.
      */
@@ -78,12 +85,16 @@ public class ItemService {
     public List<Item> itemsByEventId(UUID eventId) {
         List<Item> allItems = itemRepository.findAll();
         allItems.removeIf(item -> !eventId.equals(item.getEvent().getEventId()));
+        if (allItems.isEmpty()) {
+            throw new ItemNotFoundException("No items found for the given eventId: " + eventId);
+        }
         return allItems;
     }
 
 
     /**
      * Exclui um item baseado no seu ID.
+     *
      * @param itemId O ID do item a ser excluído.
      */
 

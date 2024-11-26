@@ -1,6 +1,7 @@
 package com.ada.holiday_party_planning.service;
 
 import com.ada.holiday_party_planning.exceptions.EventNotFoundException;
+import com.ada.holiday_party_planning.exceptions.ItemNotFoundException;
 import com.ada.holiday_party_planning.model.Event;
 import com.ada.holiday_party_planning.model.Item;
 import com.ada.holiday_party_planning.repository.EventRepository;
@@ -158,6 +159,19 @@ class ItemServiceTest {
 
         verify(itemRepository,times(1)).findAll();
 
+    }
+
+    @Test
+    void dadoItemsByEventId_quandoLancaNoItemsFoundException_entaoFiltraListaVazia(){
+        ItemRepository itemRepository = Mockito.mock(ItemRepository.class);
+        UUID eventId = UUID.randomUUID();
+
+        when(itemRepository.findAll()).thenReturn(new ArrayList<>());
+
+        ItemService itemService = new ItemService(itemRepository,eventRepository,guestRepository);
+
+        assertThrows(ItemNotFoundException.class, ()-> itemService.itemsByEventId(eventId));
+        verify(itemRepository,times(1)).findAll();
     }
 
     @Test
