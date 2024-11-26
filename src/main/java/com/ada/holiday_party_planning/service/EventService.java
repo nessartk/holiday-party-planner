@@ -17,6 +17,7 @@ import com.ada.holiday_party_planning.repository.ItemRepository;
 import com.ada.holiday_party_planning.repository.PartyOwnerRepository;
 import com.ada.holiday_party_planning.util.APIFunTranlation;
 import com.ada.holiday_party_planning.util.APIGoogleTranslate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -34,11 +35,16 @@ import java.util.*;
 @Service
 public class EventService {
 
-    private final EventRepository eventRepository;
-    private final PartyOwnerRepository partyOwnerRepository;
-    private final GuestRepository guestRepository;
-    private final ItemRepository itemRepository;
-    private final EmailService emailService;
+    @Autowired
+    private EventRepository eventRepository;
+    @Autowired
+    private PartyOwnerRepository partyOwnerRepository;
+    @Autowired
+    private GuestRepository guestRepository;
+    @Autowired
+    private ItemRepository itemRepository;
+    @Autowired
+    private EmailService emailService;
 
 
     /**
@@ -50,13 +56,6 @@ public class EventService {
      * @param itemRepository       Repositório para manipulação de itens.
      */
 
-    public EventService(EventRepository eventRepository, PartyOwnerRepository partyOwnerRepository, GuestRepository guestRepository, ItemRepository itemRepository, EmailService emailService) {
-        this.eventRepository = eventRepository;
-        this.partyOwnerRepository = partyOwnerRepository;
-        this.guestRepository = guestRepository;
-        this.itemRepository = itemRepository;
-        this.emailService = emailService;
-    }
 
     /**
      * Cria um novo evento e o associa a um dono de festa.

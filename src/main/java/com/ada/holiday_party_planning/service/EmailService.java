@@ -16,8 +16,13 @@ import java.util.Map;
 @Service
 public class EmailService {
 
+    private final JavaMailSender javaMailSender;
+
+
     @Autowired
-    private JavaMailSender javaMailSender;
+    private EmailService(JavaMailSender javaMailSender){
+        this.javaMailSender= javaMailSender;
+    }
 
     @Value("${spring.mail.username}")
     private String from;

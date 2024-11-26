@@ -21,16 +21,9 @@ import static org.mockito.Mockito.*;
 
 class ItemServiceTest {
 
-    @InjectMocks
     private ItemService itemService;// classe q contem os metodos do Item
-
-    @Mock
     private EventRepository eventRepository;
-
-    @Mock
     private ItemRepository itemRepository;
-
-    @Mock
     private GuestRepository guestRepository;
 
     @BeforeEach
