@@ -174,9 +174,38 @@ class ItemServiceTest {
         verify(itemRepository,times(1)).findAll();
     }
 
+    //Item Service / Delete item - Teste Caminho Feliz
     @Test
-    void deleteItem() {
+    void dadoUmItemIdExistente_quandoDeleteItem_entaoDeletaItem() {
+        //Dado
+        UUID itemId = UUID.randomUUID();
+        Item item = new Item();
+        item.setItemId(itemId);
+
+        when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
+        doNothing().when(itemRepository).delete(item);
+
+        //Quando
+        itemService.deleteItem(itemId);
+
+        //Então
+        verify(itemRepository, times(1)).findById(itemId);
+        verify(itemRepository, times(1)).delete(item);
     }
+
+    @Test
+    void dadoUmItemIdInexistente_quandoDeleteItem_entaoLancaItemNotFoundException() {
+        //Dado
+        UUID itemId = UUID.randomUUID();
+
+        when(itemRepository.findById(itemId)).thenReturn(Optional.empty());
+
+        //Quando e Então
+        assertThrows(ItemNotFoundException.class, () -> itemService.deleteItem(itemId));
+        verify(itemRepository, times(1)).findById(itemId);
+        verify(itemRepository, never()).delete(any());
+    }
+
 
     @Test
     void isItemWithGuest() {
