@@ -1,9 +1,11 @@
 package com.ada.holiday_party_planning.service;
 
 import com.ada.holiday_party_planning.exceptions.EventNotFoundException;
+import com.ada.holiday_party_planning.exceptions.GuestNotFoundException;
 import com.ada.holiday_party_planning.exceptions.ItemNotFoundException;
 import com.ada.holiday_party_planning.model.Event;
 import com.ada.holiday_party_planning.model.Item;
+import com.ada.holiday_party_planning.model.Guest;
 import com.ada.holiday_party_planning.repository.EventRepository;
 import com.ada.holiday_party_planning.repository.GuestRepository;
 import com.ada.holiday_party_planning.repository.ItemRepository;
@@ -212,15 +214,99 @@ class ItemServiceTest {
     }
 
     @Test
-    void itemsByGuestId() {
+    void itemsByGuest() {
+    }
+    //teste itemsByGuest
+    //caminho feliz:
+
+
+
+    //teste addItemToGuest
+    //caminho feliz
+    @Test
+    void dadoUmGuestIdEItemIdValidos_quandoAddItemToGuest_entaoItemEAssociadoAoGuest() {
+        // Dado
+        UUID guestId = UUID.randomUUID();
+        UUID itemId = UUID.randomUUID();
+
+        Guest mockGuest = new Guest();
+        mockGuest.setGuestId(guestId);
+        mockGuest.setName("Maria");
+
+        Item mockItem = new Item();
+        mockItem.setItemId(itemId);
+        mockItem.setName("Sobremesa");
+
+        when(guestRepository.findById(guestId)).thenReturn(Optional.of(mockGuest));
+        when(itemRepository.findById(itemId)).thenReturn(Optional.of(mockItem));
+        when(itemRepository.save(mockItem)).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Quando
+        Item updatedItem = itemService.addItemToGuest(guestId, itemId);
+
+        // Então
+        assertNotNull(updatedItem, "O item atualizado não deve ser nulo");
+        assertNotNull(updatedItem.getGuest(), "O convidado deve estar associado ao item");
+        assertEquals(mockGuest, updatedItem.getGuest(), "O convidado associado deve ser o mockGuest");
+        verify(guestRepository, times(1)).findById(guestId);
+        verify(itemRepository, times(1)).findById(itemId);
+        verify(itemRepository, times(1)).save(mockItem);
     }
 
+
+    //Caminho erro:
+    //Guest Inexistente
     @Test
-    void addItemToGuest() {
+    void dadoUmGuestIdInvalidoEItemIdValido_quandoAddItemToGuest_entaoLancaGuestNotFoundException() {
+        // Dado
+        UUID guestId = UUID.randomUUID();
+        UUID itemId = UUID.randomUUID();
+
+        Item item = new Item();
+        item.setItemId(itemId);
+        item.setName("Bebida");
+
+        when(guestRepository.findById(guestId)).thenReturn(Optional.empty());
+        when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
+
+        // Quando e Então
+        assertThrows(
+                GuestNotFoundException.class,
+                () -> itemService.addItemToGuest(guestId, itemId),
+                "Deve lançar GuestNotFoundException para um guestId inválido"
+        );
+
+        verify(guestRepository, times(1)).findById(guestId);
+        verify(itemRepository, never()).save(any());
     }
 
+    //Item Inexistente
     @Test
-    void removeGuestFromItem() {
+    void dadoUmGuestIdValidoEItemIdInvalido_quandoAddItemToGuest_entaoLancaItemNotFoundException() {
+        // Dado
+        UUID guestId = UUID.randomUUID();
+        UUID invalidItemId = UUID.randomUUID();
+
+        Guest mockGuest = new Guest();
+        mockGuest.setGuestId(guestId);
+        mockGuest.setName("Maria");
+
+        when(guestRepository.findById(guestId)).thenReturn(Optional.of(mockGuest));
+        when(itemRepository.findById(invalidItemId)).thenReturn(Optional.empty());
+
+        // Quando e Então
+        assertThrows(
+                ItemNotFoundException.class,
+                () -> itemService.addItemToGuest(guestId, invalidItemId),
+                "Deve lançar ItemNotFoundException para um itemId inválido"
+        );
+
+        verify(guestRepository, times(1)).findById(guestId);
+        verify(itemRepository, times(1)).findById(invalidItemId);
+        verify(itemRepository, never()).save(any());
     }
+
+
+
 
 }
