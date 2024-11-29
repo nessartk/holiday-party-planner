@@ -207,7 +207,8 @@ public class Event {
     }
 
     public void setFunActivate(Boolean funActivate) {
-        this.funActivate = funActivate;
+        //Se o valor for nulo, define como falso
+        this.funActivate = (funActivate == null) ? false : funActivate;
     }
 
     public String getCategoryFun() {

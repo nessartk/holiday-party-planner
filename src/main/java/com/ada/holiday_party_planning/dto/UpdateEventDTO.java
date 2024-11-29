@@ -37,6 +37,10 @@ public class UpdateEventDTO {
      * @param place Local do evento.
      */
 
+    public UpdateEventDTO() {
+        // Construtor vazio
+    }
+
     public UpdateEventDTO(String theme, String title, LocalDateTime date, String place,
                           String description, Boolean funActivate,
                           String categoryFun, String descriptionTranslateFun) {
