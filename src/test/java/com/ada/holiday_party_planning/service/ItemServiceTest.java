@@ -209,16 +209,155 @@ class ItemServiceTest {
     }
 
 
+    //teste isItemWithGuest
+    //caminho feliz:
     @Test
-    void isItemWithGuest() {
+    void dadoUmItemIdEGuestIdValidos_quandoIsItemWithGuest_entaoRetornaTrue() {
+        //Dado
+        UUID itemId = UUID.randomUUID();
+        UUID guestId = UUID.randomUUID();
+
+        Guest mockGuest = new Guest();
+        mockGuest.setGuestId(guestId);
+
+        Item mockItem = new Item();
+        mockItem.setItemId(itemId);
+        mockItem.setGuest(mockGuest);
+
+        when(itemRepository.findById(itemId)).thenReturn(Optional.of(mockItem));
+
+        //Quando
+        boolean result = itemService.isItemWithGuest(itemId, guestId);
+
+        //Então
+        assertTrue(result, "O método deve retornar true para um item associado ao convidado.");
+        verify(itemRepository, times(1)).findById(itemId);
     }
 
+    //caminho erro:
+    //Guest Inválido
     @Test
-    void itemsByGuest() {
+    void dadoUmItemIdValidoEGuestIdInvalido_quandoIsItemWithGuest_entaoRetornaFalse() {
+        //Dado
+        UUID itemId = UUID.randomUUID();
+        UUID guestId = UUID.randomUUID();
+
+        Guest mockGuest = new Guest();
+        mockGuest.setGuestId(UUID.randomUUID()); // ID diferente do passado no teste
+
+        Item mockItem = new Item();
+        mockItem.setItemId(itemId);
+        mockItem.setGuest(mockGuest);
+
+        when(itemRepository.findById(itemId)).thenReturn(Optional.of(mockItem));
+
+        //Quando
+        boolean result = itemService.isItemWithGuest(itemId, guestId);
+
+        //Então
+        assertFalse(result, "O método deve retornar false para um item não associado ao convidado.");
+        verify(itemRepository, times(1)).findById(itemId);
     }
+
+    //caminho erro:
+    //Item Não Encontrado
+    @Test
+    void dadoUmItemIdInvalido_quandoIsItemWithGuest_entaoLancaItemNotFoundException() {
+        //Dado
+        UUID itemId = UUID.randomUUID();
+        UUID guestId = UUID.randomUUID();
+
+        when(itemRepository.findById(itemId)).thenReturn(Optional.empty());
+
+        //Quando e Então
+        assertThrows(
+                ItemNotFoundException.class,
+                () -> itemService.isItemWithGuest(itemId, guestId),
+                "Deve lançar ItemNotFoundException para um itemId inválido."
+        );
+
+        verify(itemRepository, times(1)).findById(itemId);
+    }
+
+
     //teste itemsByGuest
     //caminho feliz:
+    @Test
+    void dadoUmGuestIdValido_quandoItemsByGuestId_entaoRetornaListaDeItensAssociados() {
+        //Dado
+        UUID guestId = UUID.randomUUID();
 
+        Guest mockGuest = new Guest();
+        mockGuest.setGuestId(guestId);
+
+        Item item1 = new Item();
+        item1.setItemId(UUID.randomUUID());
+        item1.setGuest(mockGuest);
+
+        Item item2 = new Item();
+        item2.setItemId(UUID.randomUUID());
+        item2.setGuest(mockGuest);
+
+        Item item3 = new Item();
+        item3.setItemId(UUID.randomUUID());
+        item3.setGuest(null); // Não associado a nenhum convidado
+
+        List<Item> mockItems = List.of(item1, item2, item3);
+        when(itemRepository.findAll()).thenReturn(mockItems);
+
+        //Quando
+        List<Item> result = itemService.itemsByGuestId(guestId);
+
+        //Então
+        assertEquals(2, result.size(), "Deve retornar exatamente 2 itens associados ao guestId.");
+        assertTrue(result.contains(item1), "A lista deve conter o item1.");
+        assertTrue(result.contains(item2), "A lista deve conter o item2.");
+        assertFalse(result.contains(item3), "A lista não deve conter itens não associados ao guestId.");
+        verify(itemRepository, times(1)).findAll();
+    }
+
+    //caminho falha:
+    //Nenhum Item Associado
+    @Test
+    void dadoUmGuestIdValido_quandoItemsByGuestIdNaoExistemItensAssociados_entaoRetornaListaVazia() {
+        //Dado
+        UUID guestId = UUID.randomUUID();
+
+        Item item1 = new Item();
+        item1.setItemId(UUID.randomUUID());
+        item1.setGuest(null); //Não associado a nenhum convidado
+
+        Item item2 = new Item();
+        item2.setItemId(UUID.randomUUID());
+        item2.setGuest(null); //Não associado a nenhum convidado
+
+        List<Item> mockItems = List.of(item1, item2);
+        when(itemRepository.findAll()).thenReturn(mockItems);
+
+        //Quando
+        List<Item> result = itemService.itemsByGuestId(guestId);
+
+        //Então
+        assertTrue(result.isEmpty(), "A lista deve estar vazia se nenhum item estiver associado ao guestId.");
+        verify(itemRepository, times(1)).findAll();
+    }
+
+    //caminho falha:
+    //Banco Vazio
+    @Test
+    void dadoUmGuestIdValido_quandoItemsByGuestIdRequisitadoMasNenhumItemExistirNoBanco_entaoRetornaListaVazia() {
+        //Dado
+        UUID guestId = UUID.randomUUID();
+
+        when(itemRepository.findAll()).thenReturn(List.of());
+
+        //Quando
+        List<Item> result = itemService.itemsByGuestId(guestId);
+
+        //Então
+        assertTrue(result.isEmpty(), "A lista deve estar vazia quando não há itens no repositório.");
+        verify(itemRepository, times(1)).findAll();
+    }
 
 
     //teste addItemToGuest
