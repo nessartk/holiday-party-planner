@@ -54,6 +54,12 @@ public class PartyOwner {
         setPassword(password);
     }
 
+    //método para facilitar o mock nos testes
+    public void setOwnerId(UUID ownerId) {
+        this.ownerId = ownerId;
+    }
+
+
     // Getters e Setters
 
     public UUID getOwnerId() {
