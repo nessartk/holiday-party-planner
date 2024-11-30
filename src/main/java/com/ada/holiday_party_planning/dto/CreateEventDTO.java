@@ -31,6 +31,10 @@ public class CreateEventDTO {
      * @param partyOwnerDTO Dados do proprietário do evento.
      */
 
+    public CreateEventDTO() {
+        // Construtor vazio necessário para instâncias sem parâmetros
+    }
+
     public CreateEventDTO(String theme, String title, LocalDateTime date,
                           String place, String description,
                           Boolean funActivate, String categoryFun,
