@@ -1,3 +1,4 @@
+![Test Coverage](jacoco-badge.svg)
 # Plataforma de Organização de Festas de Fim de Ano
 
 ## Descrição

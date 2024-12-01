@@ -91,7 +91,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20210307</version>
+            <version>20231013</version>
         </dependency>
         <dependency>
             <groupId>org.wiremock</groupId>
@@ -129,6 +129,9 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                        <configuration>
+                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-aggregate</outputDirectory>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>jacoco-check</id>
@@ -148,6 +151,27 @@
                                     </limits>
                                 </rule>
                             </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.sigpwned</groupId>
+                <artifactId>jacoco-badge-maven-plugin</artifactId>
+                <version>0.1.4</version>
+                <executions>
+                    <execution>
+                        <id>generate-jacoco-badge</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>badge</goal> <!-- Generate a badge from a unified JaCoCo report -->
+                        </goals>
+                        <configuration>
+                            <passing>60</passing>
+                            <!-- Legal values: instruction, branch, line, method. Optional, default instruction. -->
+                            <metric>instruction</metric>
+                            <badgeFile>${project.basedir}/jacoco-badge.svg</badgeFile>
                         </configuration>
                     </execution>
                 </executions>
