@@ -7,10 +7,14 @@ import com.ada.holiday_party_planning.exceptions.PartyOwnerNotFoundException;
 import com.ada.holiday_party_planning.mappers.PartyOwnerMapper;
 import com.ada.holiday_party_planning.model.PartyOwner;
 import com.ada.holiday_party_planning.repository.PartyOwnerRepository;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -144,5 +148,16 @@ public class PartyOwnerService {
     }
 
 
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        PartyOwner partyOwner = partyOwnerRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado com email: " + email));
+
+        // Retorna um objeto User, que implementa UserDetails
+        return new org.springframework.security.core.userdetails.User(
+                partyOwner.getEmail(),
+                partyOwner.getPassword(),
+                new ArrayList<>()
+        );
+    }
 
 }
