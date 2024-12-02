@@ -28,6 +28,8 @@ public class PartyOwnerDTO {
         this.email = email;
     }
 
+   // public PartyOwnerDTO(){}
+
     // Getters e Setters
 
     public UUID getOwnerId() {
@@ -49,4 +51,7 @@ public class PartyOwnerDTO {
     public void setEmail(String email) {
         this.email = email;
     }
+
+
+
 }
