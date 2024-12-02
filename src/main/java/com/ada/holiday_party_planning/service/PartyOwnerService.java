@@ -152,7 +152,6 @@ public class PartyOwnerService {
         PartyOwner partyOwner = partyOwnerRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado com email: " + email));
 
-        // Retorna um objeto User, que implementa UserDetails
         return new org.springframework.security.core.userdetails.User(
                 partyOwner.getEmail(),
                 partyOwner.getPassword(),
