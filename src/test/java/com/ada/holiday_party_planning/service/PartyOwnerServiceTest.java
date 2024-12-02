@@ -3,7 +3,11 @@ package com.ada.holiday_party_planning.service;
 
 import com.ada.holiday_party_planning.dto.CreatePartyOwnerDTO;
 import com.ada.holiday_party_planning.dto.PartyOwnerDTO;
+
+import com.ada.holiday_party_planning.dto.PartyOwnerLoginDTO;
+import com.ada.holiday_party_planning.dto.PartyOwnerLoginResponseDTO;
 import com.ada.holiday_party_planning.exceptions.EmailAlreadyExistsException;
+
 import com.ada.holiday_party_planning.mappers.PartyOwnerMapper;
 import com.ada.holiday_party_planning.model.PartyOwner;
 import com.ada.holiday_party_planning.repository.PartyOwnerRepository;
@@ -12,16 +16,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.security.access.method.P;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.security.AuthProvider;
 import java.util.Optional;
 import java.util.UUID;
-
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
+
 
 
 public class PartyOwnerServiceTest {
@@ -78,10 +80,45 @@ public class PartyOwnerServiceTest {
         verify(partyOwnerRepository, never()).save(any(PartyOwner.class));
     }
 
+    @Test
+    void dadoCredenciaisValidas_quandoFizerLogin_entaoRetornaPartyOwnerResponseLoginDTO() {
+        //dado
+        PartyOwnerLoginDTO userLoginInfo = new PartyOwnerLoginDTO("monica@teste", "password");
+        PartyOwner partyOwner = new PartyOwner();
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        partyOwner.setEmail("monica@teste");
+        partyOwner.setPassword(passwordEncoder.encode("password"));
+        PartyOwnerLoginResponseDTO responseDTO = new PartyOwnerLoginResponseDTO();
+
+        when(partyOwnerRepository.findByEmail("monica@teste"))
+                .thenReturn(Optional.of(partyOwner));
+
+
+        // quando
+        PartyOwnerLoginResponseDTO result = partyOwnerService.login(userLoginInfo);
+
+        // entao
+        assertNotNull(result);
+        assertEquals(result.getEmail(),"monica@teste");
+        verify(partyOwnerRepository).findByEmail("monica@teste");
+
+
+    }
 
     @Test
-    void login() {
+    void dadoEmailNaoExistente_quandoFizerLogin_entaoLancaPartyOwnerNotFoundException() {
+
+
     }
+
+    @Test
+    void dadoSenhaInvalida_quandoFizerLogin_entaoLancaInvalidCredentialsException() {
+
+
+    }
+
+
+
 
     @Test
     void getAllPartyOwners() {
