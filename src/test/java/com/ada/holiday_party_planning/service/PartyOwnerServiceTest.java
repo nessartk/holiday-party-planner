@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.*;
 import static org.mockito.Mockito.*;
@@ -208,8 +209,6 @@ public class PartyOwnerServiceTest {
         verify(partyOwnerRepository, never()).save(any());
     }
 
-    @Test
-    void loadUserByUsername() {
-    }
+
 
 }
