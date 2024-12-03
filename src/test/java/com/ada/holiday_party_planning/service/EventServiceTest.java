@@ -13,16 +13,25 @@ import com.ada.holiday_party_planning.repository.EventRepository;
 import com.ada.holiday_party_planning.repository.GuestRepository;
 import com.ada.holiday_party_planning.repository.ItemRepository;
 import com.ada.holiday_party_planning.repository.PartyOwnerRepository;
+import com.ada.holiday_party_planning.util.APIFunTranlation;
+import com.ada.holiday_party_planning.util.APIGoogleTranslate;
+import jakarta.mail.MessagingException;
+import org.apache.catalina.User;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestTemplate;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.ada.holiday_party_planning.enums.GuestStatusEnum.CONFIRMED;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -40,8 +49,12 @@ class EventServiceTest {
     @Mock
     private ItemRepository itemRepository;
 
+    @Mock
+    private final EmailService emailService = mock(EmailService.class);
+
     @InjectMocks
     private EventService eventService;
+
 
     EventServiceTest() {
         MockitoAnnotations.openMocks(this);
@@ -183,4 +196,61 @@ class EventServiceTest {
         assertEquals(2, events.size());
         verify(eventRepository, times(1)).findAll();
     }
+
+    @Test
+    void translateFun(){}
+    //TODO pesquisar mock static method
+
+
+    @Test
+    void dadoEventoEConvidados_quandoEnviarConvites_entaoEmailsEnviadosComSucesso() throws MessagingException {
+        // Dado
+        UUID eventId = UUID.randomUUID();
+
+        Event event = new Event();
+        event.setEventId(eventId);
+        event.setTitle("Aniversário");
+        event.setDate(LocalDateTime.of(2023, 12, 25, 18, 0));
+        event.setPlace("Rua das Flores, 123");
+        event.setOwner(new PartyOwner("Owner","owner@teste","password"));
+
+
+        Guest guest1 = new Guest(UUID.randomUUID(),CONFIRMED,"guest1@teste","Guest1", event,true);
+        Guest guest2 = new Guest(UUID.randomUUID(),CONFIRMED,"guest2@teste","Guest2", event,true);
+
+        when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
+        when(guestRepository.findByEvent(event)).thenReturn(Arrays.asList(guest1, guest2));
+
+        // Quando
+        eventService.sendInvites(eventId);
+
+        // Então
+        verify(emailService, times(1)).sendEmail(
+                eq("guest1@teste"),
+                eq("You're Invited!"),
+                argThat(variables -> variables.get("eventTitle").equals("Aniversário") &&
+                        variables.get("hostName").equals("Owner") &&
+                        variables.get("eventLocation").equals("Rua das Flores, 123"))
+        );
+        verify(emailService, times(1)).sendEmail(
+                eq("guest2@teste"),
+                eq("You're Invited!"),
+                argThat(variables -> variables.get("eventTitle").equals("Aniversário") &&
+                        variables.get("hostName").equals("Owner"))
+        );
+    }
+
+
+    @Test
+    void dadoEventoInexistenteQuandoEnviarConvitesEntaoLancarExcecao() {
+        // Dado
+        UUID eventId = UUID.randomUUID();
+        when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
+
+        // Quando & Então
+        assertThrows(ResponseStatusException.class, () -> eventService.sendInvites(eventId));
+
+        verifyNoInteractions(guestRepository, emailService);
+    }
+
 }
