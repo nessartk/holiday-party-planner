@@ -26,11 +26,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-/**
- * Serviço para gerenciar eventos e a lógica de negócio relacionada aos eventos e seus donos.
- *
- * Esta classe oferece operações para criar, atualizar, listar, excluir eventos e realizar traduções assíncronas para os eventos.
- */
 
 @Service
 public class EventService {
@@ -47,29 +42,11 @@ public class EventService {
     private EmailService emailService;
 
 
-    /**
-     * Construtor do serviço que recebe os repositórios necessários.
-     *
-     * @param eventRepository      Repositório para manipulação de eventos.
-     * @param partyOwnerRepository Repositório para manipulação dos donos de festa.
-     * @param guestRepository      Repositório para manipulação de convidados.
-     * @param itemRepository       Repositório para manipulação de itens.
-     */
-
-
-    /**
-     * Cria um novo evento e o associa a um dono de festa.
-     *
-     * @param ownerID        O ID do dono da festa.
-     * @param createEventDTO O DTO contendo os dados para criação do evento.
-     * @throws ResponseStatusException Se o dono da festa não for encontrado.
-     */
-
     public void createEvent(UUID ownerID, CreateEventDTO createEventDTO) {
         EventMapper eventMapper = new EventMapper(partyOwnerRepository, eventRepository);
         PartyOwner partyOwner = partyOwnerRepository.findById(ownerID)
                 .orElseThrow(PartyOwnerNotFoundException::new);
-        Event event =  eventMapper.createDTOToModel(createEventDTO,partyOwner);
+        Event event = eventMapper.createDTOToModel(createEventDTO, partyOwner);
         if (event.getFunActivate()) {
             try {
                 CategoryFun category = CategoryFun.valueOf(event.getCategoryFun().toLowerCase());
@@ -82,13 +59,6 @@ public class EventService {
         eventRepository.save(event);
     }
 
-    /**
-     * Atualiza as informações de um evento existente.
-     *
-     * @param eventId        O ID do evento a ser atualizado.
-     * @param updateEventDTO O DTO contendo os dados para atualização do evento.
-     * @throws ResponseStatusException Se o evento não for encontrado.
-     */
 
     public void updateEvent(UUID eventId, UpdateEventDTO updateEventDTO) {
         Event event = eventRepository.findById(eventId)
@@ -111,22 +81,11 @@ public class EventService {
         eventRepository.save(event);
     }
 
-    /**
-     * Lista todos os eventos cadastrados.
-     *
-     * @return Uma lista com todos os eventos.
-     */
 
     public List<Event> listAllEvent() {
         return eventRepository.findAll();
     }
 
-    /**
-     * Lista todos os eventos de um dono específico, retornando os dados no formato DTO.
-     *
-     * @param ownerID O ID do dono da festa.
-     * @return Uma lista de eventos com os dados do dono da festa.
-     */
 
     public List<EventWithPartyOwnerDTO> eventsByPartyOwner(UUID ownerID) {
         EventMapper eventMapper = new EventMapper(partyOwnerRepository, eventRepository);
@@ -134,17 +93,6 @@ public class EventService {
         return allEvents;
     }
 
-    /**
-     * Exclui um evento e seus dados relacionados, caso não haja convidados confirmados para o evento.
-     * <p>
-     * O método verifica se há convidados confirmados para o evento com o ID fornecido.
-     * Caso algum convidado esteja confirmado, uma exceção é lançada e a exclusão não é permitida.
-     * Se não houver convidados confirmados, o método realiza uma exclusão em cascata: remove
-     * todos os convidados e itens relacionados ao evento antes de excluir o próprio evento.
-     *
-     * @param eventID O ID do evento a ser excluído.
-     * @throws ResponseStatusException com status CONFLICT se houver convidados confirmados para o evento.
-     */
 
     public void deleteEvent(UUID eventID) throws ResponseStatusException {
         List<Guest> guests = guestRepository.findAll();
@@ -168,12 +116,6 @@ public class EventService {
         eventRepository.deleteById(eventID);
     }
 
-    /**
-     //     * Realiza a tradução assíncrona da descrição do evento, se ativado.
-     //     *
-     //     * @param message define a mensagem a ser traduzida
-     //     * @param category define em qual lingua vai traduzir
-     //     */
 
     @Async
     public String translateFun(String message, CategoryFun category) {

@@ -20,14 +20,14 @@ public class EmailService {
 
 
     @Autowired
-    private EmailService(JavaMailSender javaMailSender){
-        this.javaMailSender= javaMailSender;
+    private EmailService(JavaMailSender javaMailSender) {
+        this.javaMailSender = javaMailSender;
     }
 
     @Value("${spring.mail.username}")
     private String from;
 
-    public void sendEmail(String to, String subject, Map<String, String> variables) throws MessagingException{
+    public void sendEmail(String to, String subject, Map<String, String> variables) throws MessagingException {
 
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
