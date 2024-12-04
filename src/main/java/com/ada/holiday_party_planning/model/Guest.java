@@ -64,9 +64,9 @@ public class Guest {
 
     }
 
-    public Guest(String name, String email, Event event) {
-
-    }
+//    public Guest(String name, String email, Event event) {
+//
+//    }
 
     // Getters e Setters
 

@@ -445,7 +445,6 @@ class ItemServiceTest {
         verify(itemRepository, never()).save(any());
     }
 
-
-
+ //TODO  happyPath and ExceptionPath for the method removeGuestFromItem
 
 }

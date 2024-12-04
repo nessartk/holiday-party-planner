@@ -3,6 +3,7 @@ package com.ada.holiday_party_planning.dto;
 import com.ada.holiday_party_planning.enums.GuestStatusEnum;
 
 import java.util.UUID;
+import java.util.Objects;
 
 /**
  * DTO para representar as informações de um convidado em um evento.
@@ -20,9 +21,9 @@ public class GuestDTO {
      * Construtor para inicializar as informações de um convidado.
      *
      * @param guestId Identificador único do convidado.
-     * @param name Nome do convidado.
-     * @param email E-mail do convidado.
-     * @param status Status do convidado no evento.
+     * @param name    Nome do convidado.
+     * @param email   E-mail do convidado.
+     * @param status  Status do convidado no evento.
      */
 
     public GuestDTO(UUID guestId, String name, String email, GuestStatusEnum status) {
@@ -32,7 +33,6 @@ public class GuestDTO {
         this.status = status;
     }
 
-    // Getters e Setters
 
     public UUID getGuestId() {
         return guestId;
@@ -65,4 +65,21 @@ public class GuestDTO {
     public void setStatus(GuestStatusEnum status) {
         this.status = status;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GuestDTO guestDTO = (GuestDTO) o;
+        return Objects.equals(guestId, guestDTO.guestId) &&
+                Objects.equals(name, guestDTO.name) &&
+                Objects.equals(email, guestDTO.email) &&
+                Objects.equals(status, guestDTO.status);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(guestId, name, email, status);
+    }
+
 }
