@@ -18,14 +18,13 @@ public class EmailService {
 
     private final JavaMailSender javaMailSender;
 
-
     @Autowired
-    private EmailService(JavaMailSender javaMailSender) {
+    EmailService(JavaMailSender javaMailSender) {
         this.javaMailSender = javaMailSender;
     }
 
     @Value("${spring.mail.username}")
-    private String from;
+    String from;
 
     public void sendEmail(String to, String subject, Map<String, String> variables) throws MessagingException {
 

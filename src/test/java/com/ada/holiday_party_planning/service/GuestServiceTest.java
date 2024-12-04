@@ -7,7 +7,6 @@ import com.ada.holiday_party_planning.repository.EventRepository;
 import com.ada.holiday_party_planning.repository.GuestRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,11 +64,6 @@ public class GuestServiceTest {
         assertEquals(expectedDTOList.size(), result.size());
         assertEquals(expectedDTOList, result);
         Mockito.verify(guestRepository, Mockito.times(1)).findAll();
-
     }
-
-
-
-
 
 }
