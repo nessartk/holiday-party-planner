@@ -3,6 +3,7 @@ package com.ada.holiday_party_planning.service;
 import com.ada.holiday_party_planning.dto.CreateGuestDTO;
 import com.ada.holiday_party_planning.dto.GuestDTO;
 import com.ada.holiday_party_planning.enums.GuestStatusEnum;
+import com.ada.holiday_party_planning.exceptions.EmailAlreadyExistsException;
 import com.ada.holiday_party_planning.exceptions.GuestNotFoundException;
 import com.ada.holiday_party_planning.mappers.GuestMapper;
 import com.ada.holiday_party_planning.model.Event;
@@ -86,7 +87,7 @@ public class GuestServiceTest {
         List<GuestDTO> result = guestService.getAllGuests();
 
         // entao
-        assertTrue(result.isEmpty(), "A lista deve estar vazia");
+        assertTrue(result.isEmpty());
         verify(guestRepository, times(1)).findAll();
     }
 
@@ -136,7 +137,7 @@ public class GuestServiceTest {
 
         // dado
         UUID guestId = UUID.randomUUID();
-        Guest existingGuest = new Guest(guestId, GuestStatusEnum.PENDING, "old@test.com", "Old test", null, false);
+        Guest existingGuest = new Guest(guestId, GuestStatusEnum.PENDING, "ada@test.com", "Ada Tech", null, false);
         GuestDTO updatedGuestDTO = new GuestDTO(guestId, "Updated test", "updated@test.com", GuestStatusEnum.CONFIRMED);
 
         when(guestRepository.findById(guestId)).thenReturn(Optional.of(existingGuest));
@@ -180,6 +181,45 @@ public class GuestServiceTest {
         assertThrows(GuestNotFoundException.class, () -> guestService.deleteGuest(guestId));
         verify(guestRepository, times(1)).findById(guestId);
         verify(guestRepository, never()).delete(any(Guest.class));
+    }
+
+    @Test
+    void dadoEmailExistente_quandoCriarGuest_entaoLancaExcecao() {
+
+        // dado
+        CreateGuestDTO createGuestDTO = new CreateGuestDTO("Ada Tech", "ada@test.com", GuestStatusEnum.CONFIRMED, event, true);
+        Guest existingGuest = new Guest(UUID.randomUUID(), GuestStatusEnum.CONFIRMED, "ada@test.com", "Ada Tech", event, true);
+
+        when(guestRepository.findByEmail(createGuestDTO.getEmail())).thenReturn(Optional.of(existingGuest));
+
+        // quando e entao
+        assertThrows(EmailAlreadyExistsException.class, () -> guestService.createGuest(createGuestDTO));
+        verify(guestRepository, times(1)).findByEmail(createGuestDTO.getEmail());
+        verify(guestRepository, never()).save(any(Guest.class));
+    }
+
+    @Test
+    void dadoEventoSemId_quandoCriarGuest_entaoSalvarEvento() {
+
+        // dado
+        Event newEvent = new Event();
+        CreateGuestDTO createGuestDTO = new CreateGuestDTO("Ada Tech", "ada@test.com", GuestStatusEnum.CONFIRMED, newEvent, true);
+        Guest guest = new Guest(UUID.randomUUID(), GuestStatusEnum.CONFIRMED, "ada@test.com", "Ada Tech", newEvent, true);
+
+        when(eventRepository.save(any(Event.class))).thenReturn(newEvent);
+        when(guestRepository.save(any(Guest.class))).thenReturn(guest);
+
+        // quando
+        Guest newGuest = guestService.createGuest(createGuestDTO);
+        GuestDTO guestDTO = GuestMapper.toDTO(newGuest);
+
+        // entao
+        assertNotNull(guestDTO);
+        assertEquals("Ada Tech", guestDTO.getName());
+        assertEquals("ada@test.com", guestDTO.getEmail());
+        assertEquals(GuestStatusEnum.CONFIRMED, guestDTO.getStatus());
+        verify(eventRepository, times(1)).save(newEvent);
+        verify(guestRepository, times(1)).save(any(Guest.class));
     }
 
 }
