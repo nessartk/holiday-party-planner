@@ -56,7 +56,7 @@ public class EmailServiceTest {
         // quando
         emailService.sendEmail(mockPartyOwner.getEmail(), "Test Subject", variables);
 
-        // então
+        // entao
         verify(javaMailSender, times(1)).send(mimeMessage);
     }
 
@@ -66,7 +66,7 @@ public class EmailServiceTest {
         // dado
         String invalidEmail = "invalid-email";
 
-        // quando e então
+        // quando e entao
         Map<String, String> variables = new HashMap<>();
         variables.put("Key", "Value");
 
@@ -81,7 +81,7 @@ public class EmailServiceTest {
         // dado
         String nullEmail = null;
 
-        // quando e então
+        // quando e entao
         Map<String, String> variables = new HashMap<>();
         variables.put("Key", "Value");
 
