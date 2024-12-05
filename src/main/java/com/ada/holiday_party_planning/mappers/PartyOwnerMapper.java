@@ -92,7 +92,8 @@ public class PartyOwnerMapper {
 
         return new PartyOwnerLoginResponseDTO(
                 partyOwner.getName(),
-                partyOwner.getEmail()
+                partyOwner.getEmail(),
+                partyOwner.getOwnerId()
         );
     }
 
