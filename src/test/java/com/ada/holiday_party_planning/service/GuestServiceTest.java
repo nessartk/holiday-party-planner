@@ -1,24 +1,32 @@
 package com.ada.holiday_party_planning.service;
 
+import com.ada.holiday_party_planning.dto.CreateGuestDTO;
 import com.ada.holiday_party_planning.dto.GuestDTO;
+import com.ada.holiday_party_planning.enums.GuestStatusEnum;
+import com.ada.holiday_party_planning.exceptions.EmailAlreadyExistsException;
+import com.ada.holiday_party_planning.exceptions.GuestNotFoundException;
+import com.ada.holiday_party_planning.mappers.GuestMapper;
 import com.ada.holiday_party_planning.model.Event;
 import com.ada.holiday_party_planning.model.Guest;
 import com.ada.holiday_party_planning.repository.EventRepository;
 import com.ada.holiday_party_planning.repository.GuestRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+
 import static com.ada.holiday_party_planning.enums.GuestStatusEnum.CONFIRMED;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.doNothing;
 
 public class GuestServiceTest {
 
@@ -26,12 +34,14 @@ public class GuestServiceTest {
     private  GuestRepository guestRepository;
     @Mock
     private  EventRepository eventRepository;
-    @Autowired
+    @InjectMocks
     private GuestService guestService;
 
+    private Event event;
 
     @BeforeEach
     void setUp() {
+        event = new Event();
         eventRepository = mock(EventRepository.class);
         guestRepository = mock(GuestRepository.class);
         guestService = new GuestService(guestRepository,eventRepository);
@@ -64,12 +74,152 @@ public class GuestServiceTest {
         assertTrue(result.contains(guestDTO2));
         assertEquals(expectedDTOList.size(), result.size());
         assertEquals(expectedDTOList, result);
-        Mockito.verify(guestRepository, Mockito.times(1)).findAll();
+        verify(guestRepository, Mockito.times(1)).findAll();
+    }
 
+    @Test
+    void dadoListaDeGuests_quandoForVazia_entaoRetornarQueListaEstaVazia() {
+
+        // dado
+        when(guestRepository.findAll()).thenReturn(Collections.emptyList());
+
+        // quando
+        List<GuestDTO> result = guestService.getAllGuests();
+
+        // entao
+        assertTrue(result.isEmpty());
+        verify(guestRepository, times(1)).findAll();
+    }
+
+    @Test
+    public void dadoGuestId_quandoMetodoGetGuestById_entaoRetornarGuestDTO() {
+
+        // dado
+        UUID guestId = UUID.randomUUID();
+        Guest guest = new Guest(guestId,CONFIRMED,"guest1@teste", "Guest1", new Event(),true);
+        GuestDTO expectedDTO = new GuestDTO(guest.getGuestId(),guest.getName(),guest.getEmail(),CONFIRMED);
+
+        when(guestRepository.findById(guestId)).thenReturn(java.util.Optional.of(guest));
+
+        // quando
+        Optional<GuestDTO> result = guestService.getGuestById(guestId);
+
+        // entao
+        assertNotNull(result);
+        assertTrue(result.isPresent());
+        assertEquals(expectedDTO, result.get());
+        verify(guestRepository, Mockito.times(1)).findById(guestId);
+    }
+
+    @Test
+    public void dadoCreateGuestDTO_quandoMetodoCreateGuest_entaoRetornarGuestDTO() {
+
+        // dado
+        CreateGuestDTO createGuestDTO = new CreateGuestDTO("Ada Tech", "ada@test.com", GuestStatusEnum.CONFIRMED, event, true);
+        Guest guest = new Guest(UUID.randomUUID(), GuestStatusEnum.CONFIRMED, "ada@test.com", "Ada Tech", event, true);
+        when(guestRepository.save(any(Guest.class))).thenReturn(guest);
+
+        // quando
+        Guest newGuest = guestService.createGuest(createGuestDTO);
+        GuestDTO guestDTO = GuestMapper.toDTO(newGuest);
+
+        // entao
+        assertNotNull(guestDTO);
+        assertEquals("Ada Tech", guestDTO.getName());
+        assertEquals("ada@test.com", guestDTO.getEmail());
+        assertEquals(GuestStatusEnum.CONFIRMED, guestDTO.getStatus());
+        verify(guestRepository, Mockito.times(1)).save(any(Guest.class));
     }
 
 
+    @Test
+    void dadoGuestDTO_quandoAtualizarGuest_entaoRetornarGuestAtualizado() {
 
+        // dado
+        UUID guestId = UUID.randomUUID();
+        Guest existingGuest = new Guest(guestId, GuestStatusEnum.PENDING, "ada@test.com", "Ada Tech", null, false);
+        GuestDTO updatedGuestDTO = new GuestDTO(guestId, "Updated test", "updated@test.com", GuestStatusEnum.CONFIRMED);
 
+        when(guestRepository.findById(guestId)).thenReturn(Optional.of(existingGuest));
+        when(guestRepository.save(any(Guest.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // quando
+        Optional<GuestDTO> result = guestService.updateGuest(guestId, updatedGuestDTO);
+
+        // entao
+        assertTrue(result.isPresent());
+        assertEquals("Updated test", result.get().getName());
+        assertEquals("updated@test.com", result.get().getEmail());
+        assertEquals(GuestStatusEnum.CONFIRMED, result.get().getStatus());
+    }
+
+    @Test
+    void dadoGuestId_quandoExcluirGuest_entaoGuestDeveSerRemovido() {
+
+        // dado
+        UUID guestId = UUID.randomUUID();
+        Guest guest = new Guest(guestId, GuestStatusEnum.CONFIRMED, "ada@test.com", "Ada Tech", null, true);
+
+        when(guestRepository.findById(guestId)).thenReturn(Optional.of(guest));
+        doNothing().when(guestRepository).delete(guest);
+
+        // quando e entao
+        assertDoesNotThrow(() -> guestService.deleteGuest(guestId));
+        verify(guestRepository, times(1)).findById(guestId);
+        verify(guestRepository, times(1)).delete(guest);
+    }
+
+    @Test
+    void dadoGuestIdInexistente_quandoExcluirGuest_entaoLancaExcecao() {
+
+        // dado
+        UUID guestId = UUID.randomUUID();
+
+        when(guestRepository.findById(guestId)).thenReturn(Optional.empty());
+
+        // quando e entao
+        assertThrows(GuestNotFoundException.class, () -> guestService.deleteGuest(guestId));
+        verify(guestRepository, times(1)).findById(guestId);
+        verify(guestRepository, never()).delete(any(Guest.class));
+    }
+
+    @Test
+    void dadoEmailExistente_quandoCriarGuest_entaoLancaExcecao() {
+
+        // dado
+        CreateGuestDTO createGuestDTO = new CreateGuestDTO("Ada Tech", "ada@test.com", GuestStatusEnum.CONFIRMED, event, true);
+        Guest existingGuest = new Guest(UUID.randomUUID(), GuestStatusEnum.CONFIRMED, "ada@test.com", "Ada Tech", event, true);
+
+        when(guestRepository.findByEmail(createGuestDTO.getEmail())).thenReturn(Optional.of(existingGuest));
+
+        // quando e entao
+        assertThrows(EmailAlreadyExistsException.class, () -> guestService.createGuest(createGuestDTO));
+        verify(guestRepository, times(1)).findByEmail(createGuestDTO.getEmail());
+        verify(guestRepository, never()).save(any(Guest.class));
+    }
+
+    @Test
+    void dadoEventoSemId_quandoCriarGuest_entaoSalvarEvento() {
+
+        // dado
+        Event newEvent = new Event();
+        CreateGuestDTO createGuestDTO = new CreateGuestDTO("Ada Tech", "ada@test.com", GuestStatusEnum.CONFIRMED, newEvent, true);
+        Guest guest = new Guest(UUID.randomUUID(), GuestStatusEnum.CONFIRMED, "ada@test.com", "Ada Tech", newEvent, true);
+
+        when(eventRepository.save(any(Event.class))).thenReturn(newEvent);
+        when(guestRepository.save(any(Guest.class))).thenReturn(guest);
+
+        // quando
+        Guest newGuest = guestService.createGuest(createGuestDTO);
+        GuestDTO guestDTO = GuestMapper.toDTO(newGuest);
+
+        // entao
+        assertNotNull(guestDTO);
+        assertEquals("Ada Tech", guestDTO.getName());
+        assertEquals("ada@test.com", guestDTO.getEmail());
+        assertEquals(GuestStatusEnum.CONFIRMED, guestDTO.getStatus());
+        verify(eventRepository, times(1)).save(newEvent);
+        verify(guestRepository, times(1)).save(any(Guest.class));
+    }
 
 }
