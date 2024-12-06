@@ -15,7 +15,7 @@ import com.ada.holiday_party_planning.repository.EventRepository;
 import com.ada.holiday_party_planning.repository.GuestRepository;
 import com.ada.holiday_party_planning.repository.ItemRepository;
 import com.ada.holiday_party_planning.repository.PartyOwnerRepository;
-import com.ada.holiday_party_planning.util.APIFunTranlation;
+import com.ada.holiday_party_planning.util.APIFunTranslation;
 import com.ada.holiday_party_planning.util.APIGoogleTranslate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,6 +40,10 @@ public class EventService {
     private ItemRepository itemRepository;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    APIGoogleTranslate apiGoogleTranslate;
+    @Autowired
+    APIFunTranslation apiFunTranslation;
 
 
     public Event createEvent(UUID ownerID, CreateEventDTO createEventDTO) {
@@ -120,11 +124,11 @@ public class EventService {
     @Async
     public String translateFun(String message, CategoryFun category) {
         if (message != null) {
-            String textTranslate = APIGoogleTranslate.translateMensage(message, "pt-br", "en");
-            String translatedText = APIFunTranlation.tranlateFun(textTranslate, category.name().toLowerCase());
+            String textTranslate = apiGoogleTranslate.translateMessage(message, "pt-br", "en");
+            String translatedText = apiFunTranslation.translateFun(textTranslate, category.name().toLowerCase());
 
             if (category.isRepeat()) {
-                translatedText = APIGoogleTranslate.translateMensage(translatedText, "en", "pt-br");
+                translatedText = apiGoogleTranslate.translateMessage(translatedText, "en", "pt-br");
             }
 
             return translatedText;

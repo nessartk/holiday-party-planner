@@ -2,7 +2,6 @@ package com.ada.holiday_party_planning.service;
 
 import com.ada.holiday_party_planning.dto.CreateEventDTO;
 import com.ada.holiday_party_planning.dto.UpdateEventDTO;
-import com.ada.holiday_party_planning.enums.CategoryFun;
 import com.ada.holiday_party_planning.exceptions.EventDeleteConflictException;
 import com.ada.holiday_party_planning.exceptions.EventNotFoundException;
 import com.ada.holiday_party_planning.exceptions.PartyOwnerNotFoundException;
@@ -13,15 +12,10 @@ import com.ada.holiday_party_planning.repository.EventRepository;
 import com.ada.holiday_party_planning.repository.GuestRepository;
 import com.ada.holiday_party_planning.repository.ItemRepository;
 import com.ada.holiday_party_planning.repository.PartyOwnerRepository;
-import com.ada.holiday_party_planning.util.APIFunTranlation;
-import com.ada.holiday_party_planning.util.APIGoogleTranslate;
 import jakarta.mail.MessagingException;
-import org.apache.catalina.User;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestTemplate;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.server.ResponseStatusException;
 
