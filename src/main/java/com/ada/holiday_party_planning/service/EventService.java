@@ -42,7 +42,7 @@ public class EventService {
     private EmailService emailService;
 
 
-    public void createEvent(UUID ownerID, CreateEventDTO createEventDTO) {
+    public Event createEvent(UUID ownerID, CreateEventDTO createEventDTO) {
         EventMapper eventMapper = new EventMapper(partyOwnerRepository, eventRepository);
         PartyOwner partyOwner = partyOwnerRepository.findById(ownerID)
                 .orElseThrow(PartyOwnerNotFoundException::new);
@@ -56,7 +56,7 @@ public class EventService {
                 System.out.println("Erro: Categoria não encontrada para a descrição do evento.");
             }
         }
-        eventRepository.save(event);
+        return eventRepository.save(event);
     }
 
 

@@ -63,14 +63,14 @@ public class EventController {
      * Cria um novo evento associado a um proprietário específico.
      *
      * @param ownerId Identificador do proprietário do evento.
-     * @param event   Dados do evento a ser criado.
+     * @param eventDto   Dados do evento a ser criado.
      * @return Resposta HTTP com status 201 Created em caso de sucesso.
      */
 
     @PostMapping("/{ownerId}/create")
-    public ResponseEntity<Void> createEvent(@PathVariable UUID ownerId, @RequestBody CreateEventDTO event) {
-        eventService.createEvent(ownerId, event);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<UUID> createEvent(@PathVariable UUID ownerId, @RequestBody CreateEventDTO eventDto) {
+       Event event =  eventService.createEvent(ownerId, eventDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(event.getEventId());
     }
 
     /**

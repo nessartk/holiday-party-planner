@@ -1,6 +1,6 @@
 package com.ada.holiday_party_planning.controller;
 
-
+import com.ada.holiday_party_planning.dto.GuestDTO;
 import com.ada.holiday_party_planning.dto.PartyOwnerDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class EventControllerIntegrationTest {
+public class ItemControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -31,12 +31,12 @@ public class EventControllerIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void eventFlow() throws Exception {
-        // criar owner
+    void eventFlow() throws Exception{
+        // criar PartyOwner
         MvcResult result = this.mockMvc.perform(post("/party-owners/register")
                         .content("{\n" +
                                 "    \"name\" : \"Owner2\",\n" +
-                                "    \"email\": \"owner4@teste.com\",\n" +
+                                "    \"email\": \"owner5@teste.com\",\n" +
                                 "    \"password\": \"senha\"\n" +
                                 "}")
                         .accept(MediaType.APPLICATION_JSON)
@@ -46,7 +46,7 @@ public class EventControllerIntegrationTest {
         PartyOwnerDTO ownerDTO = objectMapper.readValue(json, PartyOwnerDTO.class);
 
         //rever createDTO e ID
-        this.mockMvc.perform(post("/event/{ownerId}/create", ownerDTO.getOwnerId())
+        MvcResult result1 = this.mockMvc.perform(post("/event/{ownerId}/create", ownerDTO.getOwnerId())
                         .content("{" +
                                 "    \"theme\" : \"Natalino\"," +
                                 "    \"title\": \"Ceia de Natal\"," +
@@ -58,14 +58,32 @@ public class EventControllerIntegrationTest {
                                 "}")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(user("owner4@teste.com").password("senha")))
+                        .with(user("owner5@teste.com").password("senha")))
                 .andDo(print())
-                .andExpect(status().isCreated());
+                .andReturn();
+        String eventId = result1.getResponse().getContentAsString().replaceAll("\"","");
 
-        //TODO testar os demais endpoints
+
+        // criar item
+        this.mockMvc.perform(post("/item/{eventId}/create",eventId)
+                        .content("{\n" +
+                                "    \"name\": \"Chester\"," +
+                                "    \"quantity\": 1," +
+                                "    \"value\": 50.0" +
+                                "}")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user("owner5@teste.com").password("senha")))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Chester")))
+                .andExpect(content().string(containsString("1")))
+                .andExpect(content().string(containsString("50.0")));
+
+        //TODO testar demais endpoints
+
 
 
     }
+
 }
-
-
