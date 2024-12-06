@@ -25,7 +25,7 @@ public class Item {
     @Column(name="quantity", nullable = false)
     private int quantity;
 
-    @Column(name= "value", nullable = false)
+    @Column(name= "item_value", nullable = false)
     private double value;
 
     @ManyToOne
