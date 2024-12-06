@@ -4,10 +4,17 @@
 ## Descrição
 
 "Plataforma de Organização de Festas de Fim de Ano" é uma aplicação que oferece uma interface web (SPRING) responsável pelo planejamento e organização de festas de fim de ano. Projeto desenvolvido em JAVA e SPRING, utilizando bibliotecas externas para a administração de bancos de dados.
+## Modelagem de Caso de Uso - Modelo Conceitual
+![Diagrama de Caso de Uso](images/UseCase.jpeg)
+
+## Modelagem de Classes - Modelo Conceitual
+![Diagrama de classe](images/DiagramaDeClasse.jpeg)
 
 ## Modelagem de Banco de Dados - Modelo Conceitual
 
 <a href="https://ibb.co/k4Zkz5D"><img src="https://i.ibb.co/2vJmRWM/party-planner-conceitual.png" alt="party-planner-conceitual" border="0" /></a>
+
+
 
 ## A Aplicação
 
@@ -81,7 +88,7 @@
 1. Passo a Passo para clonar o repositório e executar o projeto:
   - Clonar o repositório Abra o terminal, navegue até o diretório onde deseja clonar o projeto e execute o comando:
    ``` bash
-   git clone https://github.com/throv/holiday-party-planner.git
+   git clone https://github.com/nessartk/holiday-party-planner.git
    ```
 2. Inicializar o Servidor PostgreSQL;
   - Certifique-se de que o PostgreSQL está instalado e o serviço está ativo. Em alguns sistemas operacionais, você pode inicializar o servidor com o comando:
@@ -113,6 +120,20 @@
    ```
   - A aplicação deverá estar disponível em http://localhost:8080.
 
+
+  - Executar os testes:
+  ``` bash
+   mvn install
+   mvn verify
+   ```
+  - O relatório de testes do JaCoCo é gerado no caminho:
+ ``` bash
+   target
+   site
+   intex.html
+   ```
+
+
 ## Projeto desenvolvido por:
 
 [<img alt="Alan Filho" height="75px" src="https://avatars.githubusercontent.com/u/125782386?v=4" width="75px"/>](https://github.com/oalleeN)
@@ -123,7 +144,10 @@
 [<img alt="Thais Vieira" height="75px" src="https://avatars.githubusercontent.com/u/104239787?v=4" width="75px"/>](https://github.com/throv)
 [<img alt="Vanessa Rutkoski" height="75px" src="https://avatars.githubusercontent.com/u/98660246?v=4" width="75px"/>](https://github.com/nessartk)
 
-
+## Equipe responsável pelos testes:
+[<img alt="Alan Filho" height="75px" src="https://avatars.githubusercontent.com/u/125782386?v=4" width="75px"/>](https://github.com/oalleeN)
+[<img alt="Maria Eduarda" height="75px" src="https://avatars.githubusercontent.com/u/134453107?v=4" width="75px"/>](https://github.com/mariaemrqs)
+[<img alt="Vanessa Rutkoski" height="75px" src="https://avatars.githubusercontent.com/u/98660246?v=4" width="75px"/>](https://github.com/nessartk)
 ## **Licença**
 
 Este projeto é licenciado sob a [MIT License](LICENSE).
