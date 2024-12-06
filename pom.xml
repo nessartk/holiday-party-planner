@@ -154,6 +154,12 @@
                         </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <excludes>
+                        <exclude>**/util/HttpUtil.class</exclude>
+                        <exclude>**/util/TestApiTranslate.class</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
 
             <plugin>
